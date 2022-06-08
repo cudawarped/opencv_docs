@@ -1,1 +1,1 @@
-Sitemap: https://fastpages.fast.ai/sitemap.xml
+Sitemap: https://cudawarped.github.io/opencv_docs/sitemap.xml
