@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Other title | fastpages</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Other title" />
+<meta name="author" content="cudawarped" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Fix common OpenCV python DLL load failed error when building python bindings from source" />
+<meta property="og:description" content="Fix common OpenCV python DLL load failed error when building python bindings from source" />
+<link rel="canonical" href="https://cudawarped.github.io/opencv_docs/opencv/cuda/python/2022/07/21/opencv_cvs_dll_load_failed.html" />
+<meta property="og:url" content="https://cudawarped.github.io/opencv_docs/opencv/cuda/python/2022/07/21/opencv_cvs_dll_load_failed.html" />
+<meta property="og:site_name" content="fastpages" />
+<meta property="og:image" content="https://cudawarped.github.io/opencv_docs/images/diagram.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-07-21T00:00:00-05:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://cudawarped.github.io/opencv_docs/images/diagram.png" />
+<meta property="twitter:title" content="Other title" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"cudawarped"},"dateModified":"2022-07-21T00:00:00-05:00","datePublished":"2022-07-21T00:00:00-05:00","description":"Fix common OpenCV python DLL load failed error when building python bindings from source","headline":"Other title","image":"https://cudawarped.github.io/opencv_docs/images/diagram.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://cudawarped.github.io/opencv_docs/opencv/cuda/python/2022/07/21/opencv_cvs_dll_load_failed.html"},"url":"https://cudawarped.github.io/opencv_docs/opencv/cuda/python/2022/07/21/opencv_cvs_dll_load_failed.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/opencv_docs/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://cudawarped.github.io/opencv_docs/feed.xml" title="fastpages" /><link rel="shortcut icon" type="image/x-icon" href="/opencv_docs/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/opencv_docs/">fastpages</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/opencv_docs/about/">About Me</a><a class="page-link" href="/opencv_docs/search/">Search</a><a class="page-link" href="/opencv_docs/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Other title</h1><p class="page-description">Fix common OpenCV python DLL load failed error when building python bindings from source</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-07-21T00:00:00-05:00" itemprop="datePublished">
+        Jul 21, 2022
+      </time>• 
+          <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+            <span class="p-author h-card" itemprop="name">cudawarped</span></span>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      8 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/opencv_docs/categories/#opencv">opencv</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/opencv_docs/categories/#cuda">cuda</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/opencv_docs/categories/#python">python</a>
+        
+      
+      </p>
+    
+
+    
+      
+        <div class="pb-5 d-flex flex-justify-center">
+          <div class="px-2">
+
+    <a href="https://github.com/cudawarped/opencv_docs/tree/master/_notebooks/opencv_cvs_dll_load_failed.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/opencv_docs/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://mybinder.org/v2/gh/cudawarped/opencv_docs/master?filepath=_notebooks%2Fopencv_cvs_dll_load_failed.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/opencv_docs/assets/badges/binder.svg" alt="Open In Binder"/>
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/cudawarped/opencv_docs/blob/master/_notebooks/opencv_cvs_dll_load_failed.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/opencv_docs/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+          <div class="px-2">
+  <a href="https://deepnote.com/launch?url=https%3A%2F%2Fgithub.com%2Fcudawarped%2Fopencv_docs%2Fblob%2Fmaster%2F_notebooks%2Fopencv_cvs_dll_load_failed.ipynb" target="_blank">
+      <img class="notebook-badge-image" src="/opencv_docs/assets/badges/deepnote.svg" alt="Launch in Deepnote"/>
+  </a>
+</div>
+
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul id="toc" class="section-nav">
+<li class="toc-entry toc-h3"><a href="#Quick-fix-when-not-using-the-OpenCV-python-loader">Quick fix when not using the OpenCV python loader </a></li>
+<li class="toc-entry toc-h2"><a href="#You-have-installed-the-python-loader">You have installed the python loader </a></li>
+<li class="toc-entry toc-h2"><a href="#Built-OpenCV-with-OPENCV_SKIP_PYTHON_LOADER=ON">Built OpenCV with OPENCV_SKIP_PYTHON_LOADER=ON </a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#Using-Process-Monitor-fo-find-the-missing-dll">Using Process Monitor fo find the missing dll </a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h2"><a href="#Permanantely-fixing">Permanantely fixing </a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#Updating-OpenCV's-installed-python-loader">Updating OpenCV&#39;s installed python loader </a></li>
+<li class="toc-entry toc-h3"><a href="#Creating-python-loader">Creating python loader </a></li>
+</ul>
+</li>
+</ul><!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/opencv_cvs_dll_load_failed.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span> 
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>So your on Windows using python &gt;= 3.8, you have built OpenCV &gt;= 4.6 from source, manually copied .. python path them to your distributions site... directory, added the path to the directory containing opencv.dll and any other shared library dependencies and your seeing something similar to the following.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#os.environ["OpenCV_LOADER_DEBUG"]="1"</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-intense-fg ansi-bold">---------------------------------------------------------------------------</span>
+<span class="ansi-red-intense-fg ansi-bold">ModuleNotFoundError</span>                       Traceback (most recent call last)
+Input <span class="ansi-green-intense-fg ansi-bold">In [1]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 3&gt;</span><span class="ansi-blue-intense-fg ansi-bold">()</span>
+<span class="ansi-green-fg">      1</span> <span style="color: rgb(95,135,135)">#import os</span>
+<span class="ansi-green-fg">      2</span> <span style="color: rgb(95,135,135)">#os.environ["OpenCV_LOADER_DEBUG"]="1"</span>
+<span class="ansi-green-intense-fg ansi-bold">----&gt; 3</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> <span class="ansi-bold" style="color: rgb(0,0,255)">cv2</span>
+
+<span class="ansi-red-intense-fg ansi-bold">ModuleNotFoundError</span>: No module named 'cv2'</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>What's going on? Although the message is quite explicit regarding the cause, it doesn't really help with finding a solution. In a nutshell python has found .pyd (shared lib), tried and failed to load it because a it can't find a dependant shared library. Now the advice I have seen online regarding this is to dig out trusty dependancy walker, load the .pyd and see which dependencies the system can't find.</p>
+<p>Now this is solid advice if we had a C++ application and/or we were using python &lt; 3.8 (which uses the system/user path for dll re), however we are not, so even if dependency walker can't detect any problems we may still be facing the above error.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>There is a missing dll, which needs to be added with ... before calling import cv2, now if you have installed the python loader with OpenCV then you will likeliy need to search with .... to find it, however if you have not you may be able to try the quick fix below may work for you</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Quick-fix-when-not-using-the-OpenCV-python-loader">
+<a class="anchor" href="#Quick-fix-when-not-using-the-OpenCV-python-loader" aria-hidden="true"><span class="octicon octicon-link"></span></a>Quick fix when not using the OpenCV python loader<a class="anchor-link" href="#Quick-fix-when-not-using-the-OpenCV-python-loader"> </a>
+</h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Using the flag OPENCV_SKIP_PYTHON_LOADER=ON prevents the python bindings from being installed when you build install OpenCV, therefore depending on how you installed cv2 there shouldn't be a cv2 directory inside lib/site-sitepackages and you should something similar to the following</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>There are multiple reasons that the OpenCV python loader may be missing
+1) You didn't build install</p>
+<p>2) OPENCV_SKIP_PYTHON_LOADER=ON was passed to cmake</p>
+<p>3) The lib/site-packages/cv2 diretory was deleted</p>
+<p>Whatever the reason if you are seeing the above error you have likely manually "installed" the python bindings either with</p>
+<p>1) set PYTHONPATH="OPENCV_BUILD_PATH/lib/python3/"</p>
+<p>2) or by manually copying .... pyd to the lib/site-packages/</p>
+<p>Whichever way this was performed, you will be missing (unless your using a distribution which automatically adds .. directories from the path to the dll search path)</p>
+<p>os.add_dll_directory("OPENCV_BUID_PATH/bin/");</p>
+<p>in this case there will be at least one dll search path which needs to be added.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">os</span><span class="p">;</span>
+<span class="n">OPENCV_BUID_PATH</span> <span class="o">=</span> <span class="s2">"D:/build/opencv/cuda_11_7_cc_8_6_ff_sym/"</span>
+<span class="n">os</span><span class="o">.</span><span class="n">add_dll_directory</span><span class="p">(</span><span class="n">OPENCV_BUID_PATH</span> <span class="o">+</span> <span class="s2">"/bin/"</span><span class="p">);</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+<details class="description">
+      <summary class="btn btn-sm" data-open="Hide Output" data-close="Show Output"></summary>
+        <p>
+</p>
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-intense-fg ansi-bold">---------------------------------------------------------------------------</span>
+<span class="ansi-red-intense-fg ansi-bold">ImportError</span>                               Traceback (most recent call last)
+Input <span class="ansi-green-intense-fg ansi-bold">In [24]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 5&gt;</span><span class="ansi-blue-intense-fg ansi-bold">()</span>
+<span class="ansi-green-fg">      3</span> OPENCV_BUID_PATH <span style="color: rgb(98,98,98)">=</span> <span style="color: rgb(175,0,0)">"</span><span style="color: rgb(175,0,0)">D:/build/opencv/cuda_11_7_cc_8_6_ff_sym/</span><span style="color: rgb(175,0,0)">"</span>
+<span class="ansi-green-fg">      4</span> os<span style="color: rgb(98,98,98)">.</span>add_dll_directory(OPENCV_BUID_PATH <span style="color: rgb(98,98,98)">+</span> <span style="color: rgb(175,0,0)">"</span><span style="color: rgb(175,0,0)">/bin/</span><span style="color: rgb(175,0,0)">"</span>);
+<span class="ansi-green-intense-fg ansi-bold">----&gt; 5</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> <span class="ansi-bold" style="color: rgb(0,0,255)">cv2</span>
+
+<span class="ansi-red-intense-fg ansi-bold">ImportError</span>: DLL load failed while importing cv2: The specified module could not be found.</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+    </details>
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>If that didn't work and you are using the CUDA modules you will also need to add 
+os.add_dll_directory("C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.7\bin");, if that doesn't work then you need to locate the missing dll and manually add it, seee ...</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">os</span><span class="o">.</span><span class="n">add_dll_directory</span><span class="p">(</span><span class="s2">"C:</span><span class="se">\\</span><span class="s2">Program Files</span><span class="se">\\</span><span class="s2">NVIDIA GPU Computing Toolkit</span><span class="se">\\</span><span class="s2">CUDA</span><span class="se">\\</span><span class="s2">v11.7</span><span class="se">\\</span><span class="s2">bin"</span><span class="p">);</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+<details class="description">
+      <summary class="btn btn-sm" data-open="Hide Output" data-close="Show Output"></summary>
+        <p>
+</p>
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-intense-fg ansi-bold">---------------------------------------------------------------------------</span>
+<span class="ansi-red-intense-fg ansi-bold">ImportError</span>                               Traceback (most recent call last)
+Input <span class="ansi-green-intense-fg ansi-bold">In [25]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 3&gt;</span><span class="ansi-blue-intense-fg ansi-bold">()</span>
+<span class="ansi-green-fg">      1</span> <span style="color: rgb(95,135,135)">#collapse-output</span>
+<span class="ansi-green-fg">      2</span> os<span style="color: rgb(98,98,98)">.</span>add_dll_directory(<span style="color: rgb(175,0,0)">"</span><span style="color: rgb(175,0,0)">C:</span><span class="ansi-bold" style="color: rgb(175,95,0)">\\</span><span style="color: rgb(175,0,0)">Program Files</span><span class="ansi-bold" style="color: rgb(175,95,0)">\\</span><span style="color: rgb(175,0,0)">NVIDIA GPU Computing Toolkit</span><span class="ansi-bold" style="color: rgb(175,95,0)">\\</span><span style="color: rgb(175,0,0)">CUDA</span><span class="ansi-bold" style="color: rgb(175,95,0)">\\</span><span style="color: rgb(175,0,0)">v11.7</span><span class="ansi-bold" style="color: rgb(175,95,0)">\\</span><span style="color: rgb(175,0,0)">bin</span><span style="color: rgb(175,0,0)">"</span>);
+<span class="ansi-green-intense-fg ansi-bold">----&gt; 3</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> <span class="ansi-bold" style="color: rgb(0,0,255)">cv2</span>
+
+<span class="ansi-red-intense-fg ansi-bold">ImportError</span>: DLL load failed while importing cv2: The specified module could not be found.</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+    </details>
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">sysconfig</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">sysconfig</span><span class="o">.</span><span class="n">get_paths</span><span class="p">()[</span><span class="s2">"purelib"</span><span class="p">]</span><span class="o">+</span><span class="s2">"/cv2"</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-intense-fg ansi-bold">---------------------------------------------------------------------------</span>
+<span class="ansi-red-intense-fg ansi-bold">FileNotFoundError</span>                         Traceback (most recent call last)
+Input <span class="ansi-green-intense-fg ansi-bold">In [13]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 3&gt;</span><span class="ansi-blue-intense-fg ansi-bold">()</span>
+<span class="ansi-green-fg">      1</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> <span class="ansi-bold" style="color: rgb(0,0,255)">sysconfig</span>
+<span class="ansi-green-fg">      2</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> <span class="ansi-bold" style="color: rgb(0,0,255)">os</span>
+<span class="ansi-green-intense-fg ansi-bold">----&gt; 3</span> <span class="ansi-yellow-bg">os</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">listdir</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">sysconfig</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">get_paths</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">)</span><span class="ansi-yellow-bg">[</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">"</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">purelib</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">"</span><span class="ansi-yellow-bg">]</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">+</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">"</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">/cv2</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">"</span><span class="ansi-yellow-bg">)</span>
+
+<span class="ansi-red-intense-fg ansi-bold">FileNotFoundError</span>: [WinError 3] The system cannot find the path specified: 'C:\\Users\\b\\mambaforge\\Lib\\site-packages/cv2'</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In this case you will definitely be missing the directory containing .... and ... and if you built with CUDA you will also be missing ... therefore before doing anything else</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="You-have-installed-the-python-loader">
+<a class="anchor" href="#You-have-installed-the-python-loader" aria-hidden="true"><span class="octicon octicon-link"></span></a>You have installed the python loader<a class="anchor-link" href="#You-have-installed-the-python-loader"> </a>
+</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>When you built OpenCV with cmake you didn't pass OPENCV_SKIP_PYTHON_LOADER=ON and there is a cv2 directory inside site-packages/lib</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">sysconfig</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">os</span><span class="p">;</span>
+<span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">sysconfig</span><span class="o">.</span><span class="n">get_paths</span><span class="p">()[</span><span class="s2">"purelib"</span><span class="p">]</span><span class="o">+</span><span class="s2">"/cv2"</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-intense-fg ansi-bold">---------------------------------------------------------------------------</span>
+<span class="ansi-red-intense-fg ansi-bold">FileNotFoundError</span>                         Traceback (most recent call last)
+Input <span class="ansi-green-intense-fg ansi-bold">In [7]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 3&gt;</span><span class="ansi-blue-intense-fg ansi-bold">()</span>
+<span class="ansi-green-fg">      1</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> <span class="ansi-bold" style="color: rgb(0,0,255)">sysconfig</span>;
+<span class="ansi-green-fg">      2</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> <span class="ansi-bold" style="color: rgb(0,0,255)">os</span>;
+<span class="ansi-green-intense-fg ansi-bold">----&gt; 3</span> <span class="ansi-yellow-bg">os</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">listdir</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">sysconfig</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">get_paths</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">)</span><span class="ansi-yellow-bg">[</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">"</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">purelib</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">"</span><span class="ansi-yellow-bg">]</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">+</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">"</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">/cv2</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">"</span><span class="ansi-yellow-bg">)</span>
+
+<span class="ansi-red-intense-fg ansi-bold">FileNotFoundError</span>: [WinError 3] The system cannot find the path specified: 'C:\\Users\\b\\mambaforge\\Lib\\site-packages/cv2'</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The python loader script should have added the directory to ... and the CUDA SDK if you built with CUDA modules, so to track down the missing</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Built-OpenCV-with-OPENCV_SKIP_PYTHON_LOADER=ON">
+<a class="anchor" href="#Built-OpenCV-with-OPENCV_SKIP_PYTHON_LOADER=ON" aria-hidden="true"><span class="octicon octicon-link"></span></a>Built OpenCV with OPENCV_SKIP_PYTHON_LOADER=ON<a class="anchor-link" href="#Built-OpenCV-with-OPENCV_SKIP_PYTHON_LOADER=ON"> </a>
+</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Using the flag OPENCV_SKIP_PYTHON_LOADER=ON prevents the python bindings from being installed when you build install OpenCV, therefore there shouldn't be a cv2 directory insidde lib/site-sitepackages and you should see the following</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">sysconfig</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">os</span><span class="p">;</span>
+<span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">sysconfig</span><span class="o">.</span><span class="n">get_paths</span><span class="p">()[</span><span class="s2">"purelib"</span><span class="p">]</span><span class="o">+</span><span class="s2">"/cv2"</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-intense-fg ansi-bold">---------------------------------------------------------------------------</span>
+<span class="ansi-red-intense-fg ansi-bold">FileNotFoundError</span>                         Traceback (most recent call last)
+Input <span class="ansi-green-intense-fg ansi-bold">In [9]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 3&gt;</span><span class="ansi-blue-intense-fg ansi-bold">()</span>
+<span class="ansi-green-fg">      1</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> <span class="ansi-bold" style="color: rgb(0,0,255)">sysconfig</span>;
+<span class="ansi-green-fg">      2</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> <span class="ansi-bold" style="color: rgb(0,0,255)">os</span>;
+<span class="ansi-green-intense-fg ansi-bold">----&gt; 3</span> <span class="ansi-yellow-bg">os</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">listdir</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">sysconfig</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">get_paths</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">)</span><span class="ansi-yellow-bg">[</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">"</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">purelib</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">"</span><span class="ansi-yellow-bg">]</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">+</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">"</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">/cv2</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">"</span><span class="ansi-yellow-bg">)</span>
+
+<span class="ansi-red-intense-fg ansi-bold">FileNotFoundError</span>: [WinError 3] The system cannot find the path specified: 'C:\\Users\\b\\mambaforge\\Lib\\site-packages/cv2'</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>then you enter something similar to the below in the command prompt before</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>set PYTHONPATH="OPENCV_BUILD_PATH/lib/python3/"</p>
+<p>set PATH="OPENCV_BUID_PATH/bin";%PATH%</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>or for my set up in python after PYTHONPATH has been parsed</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="n">OPENCV_BUID_PATH</span> <span class="o">=</span> <span class="s2">"D:/build/opencv/cuda_11_7_cc_8_6_ff_sym/"</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">OPENCV_BUID_PATH</span> <span class="o">+</span> <span class="s2">"/lib/python3/"</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">OPENCV_BUID_PATH</span> <span class="o">+</span> <span class="s2">"/bin/"</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Advice is to skip loader it is for stand alone distributions 
+<a href="https://github.com/opencv/opencv/issues/13202#issuecomment-439730899">https://github.com/opencv/opencv/issues/13202#issuecomment-439730899</a>
+Add python path
+Therefore the discussion assumes that the above is the method used for adding python etc.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">cv2</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-intense-fg ansi-bold">---------------------------------------------------------------------------</span>
+<span class="ansi-red-intense-fg ansi-bold">ImportError</span>                               Traceback (most recent call last)
+Input <span class="ansi-green-intense-fg ansi-bold">In [19]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 1&gt;</span><span class="ansi-blue-intense-fg ansi-bold">()</span>
+<span class="ansi-green-intense-fg ansi-bold">----&gt; 1</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> <span class="ansi-bold" style="color: rgb(0,0,255)">cv2</span>
+
+<span class="ansi-red-intense-fg ansi-bold">ImportError</span>: DLL load failed while importing cv2: The specified module could not be found.</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>What's going on?  Although the message is quite explicit regarding the cause, it doesn't really help with finding a solution.  In a nutshell python has found .pyd (shared lib), tried and failed to load it because a it can't find a dependant shared library.  Now the advice I have seen online regarding this is to dig out trusty dependancy walker, load the .pyd and see which dependencies the system can't find.</p>
+<p>Now this is solid advice if we had a C++ application and/or we were using python &lt; 3.8 (which uses the system/user path for dll re), however we are not, so even if dependency walker can't detect any problems we may still be facing the above error.</p>
+<p>So what to do, well quick a quick and dirty solution is, if you are pretty sure of the folders containing your missing dll's, just add them to the dll search path in python and see if this reolves your issue.  For example if you have built with CUDA 
+then unless you are using something like annaconda, you will need to add the directory containing opencv and hash (bin) and the directory containing the Nvidia shared libs.</p>
+<p>you are most likely facing this error becuase the dll's inside C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/vMAJOR.MINOR/bin cannot be found, so you could try</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">os</span><span class="p">;</span>
+<span class="n">os</span><span class="o">.</span><span class="n">add_dll_directory</span><span class="p">(</span><span class="n">OPENCV_BUID_PATH</span> <span class="o">+</span> <span class="s2">"/bin/"</span><span class="p">);</span>
+<span class="n">os</span><span class="o">.</span><span class="n">add_dll_directory</span><span class="p">(</span><span class="s2">"C:</span><span class="se">\\</span><span class="s2">Program Files</span><span class="se">\\</span><span class="s2">NVIDIA GPU Computing Toolkit</span><span class="se">\\</span><span class="s2">CUDA</span><span class="se">\\</span><span class="s2">v11.7</span><span class="se">\\</span><span class="s2">bin"</span><span class="p">);</span>
+<span class="n">os</span><span class="o">.</span><span class="n">add_dll_directory</span><span class="p">(</span><span class="s2">"D:</span><span class="se">\\</span><span class="s2">3rd_party</span><span class="se">\\</span><span class="s2">deps</span><span class="se">\\</span><span class="s2">ffmpeg-n5.0-latest-win64-gpl-shared-5.0</span><span class="se">\\</span><span class="s2">bin"</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In my case this solved the problem but what do you do if you don't know exactly what dll's are missing, well thanks to alec suggestion you can use process monitor <a href="https://docs.microsoft.com/en-us/sysinternals/downloads/procmon">https://docs.microsoft.com/en-us/sysinternals/downloads/procmon</a> on windows to track down the problem.  With process monitor you can track the files are opened on the call to import cv2 and see exactly which dll can't be found.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Using-Process-Monitor-fo-find-the-missing-dll">
+<a class="anchor" href="#Using-Process-Monitor-fo-find-the-missing-dll" aria-hidden="true"><span class="octicon octicon-link"></span></a>Using Process Monitor fo find the missing dll<a class="anchor-link" href="#Using-Process-Monitor-fo-find-the-missing-dll"> </a>
+</h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>First download/extract/run process monitor. On opening you will be presented with the option to filter the output.  We only want to see files which are accesses by the python.exe process, therefore the filter options are</p>
+<p>On the dropdown select "Process Name" and in the text box type python.exe and click Add - Process explorer will by defualt output for all processes this will reduce this down to just python.</p>
+<p>Then "Operation" is CreateFile -&gt; this</p>
+<p>Process monitor produces a lot of output, these settings should filter for</p>
+<p>To make things easy to read make sure no other python process are running.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><img src="/opencv_docs/images/copied_from_nb/imgs/proc_mon_filter.png" alt="title"></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now start python and before typing import cv2, press the clear button (red trash can) in process monitor to clear any output generated during pythons initialization.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><img src="/opencv_docs/images/copied_from_nb/imgs/proc_mon_failed_search_opencv.png" alt="title"></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The output shows that we successfully found cv2.cp..... which is why were not seeing ModuleNotFoundError: No module named 'cv2' however it also shows several attempts have been made to locate opencv_img_hash_460.dll and opencv_world460.dll without success even though they are on the search path.  Since Python 3.8.... 
+Therefore we add</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">os</span><span class="p">;</span>
+<span class="n">os</span><span class="o">.</span><span class="n">add_dll_directory</span><span class="p">(</span><span class="n">OPENCV_BUID_PATH</span> <span class="o">+</span> <span class="s2">"/bin/"</span><span class="p">);</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">cv2</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-intense-fg ansi-bold">---------------------------------------------------------------------------</span>
+<span class="ansi-red-intense-fg ansi-bold">ImportError</span>                               Traceback (most recent call last)
+Input <span class="ansi-green-intense-fg ansi-bold">In [7]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 1&gt;</span><span class="ansi-blue-intense-fg ansi-bold">()</span>
+<span class="ansi-green-intense-fg ansi-bold">----&gt; 1</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> <span class="ansi-bold" style="color: rgb(0,0,255)">cv2</span>
+
+<span class="ansi-red-intense-fg ansi-bold">ImportError</span>: DLL load failed while importing cv2: The specified module could not be found.</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><img src="/opencv_docs/images/copied_from_nb/imgs/proc_mon_failed_search_nvidia.png" alt="title"></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now can see that opencv_img_hash_460.dll and opencv_world460.dll after a few attempts were located successfully however we are missing nppc64_11.dll etc. which are all part of the CUDA toolkit.  The solution add these as well and</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">os</span><span class="p">;</span>
+<span class="n">os</span><span class="o">.</span><span class="n">add_dll_directory</span><span class="p">(</span><span class="s2">"C:</span><span class="se">\\</span><span class="s2">Program Files</span><span class="se">\\</span><span class="s2">NVIDIA GPU Computing Toolkit</span><span class="se">\\</span><span class="s2">CUDA</span><span class="se">\\</span><span class="s2">v11.7</span><span class="se">\\</span><span class="s2">bin"</span><span class="p">);</span>
+<span class="n">os</span><span class="o">.</span><span class="n">add_dll_directory</span><span class="p">(</span><span class="s2">"D:</span><span class="se">\\</span><span class="s2">3rd_party</span><span class="se">\\</span><span class="s2">deps</span><span class="se">\\</span><span class="s2">ffmpeg-n5.0-latest-win64-gpl-shared-5.0</span><span class="se">\\</span><span class="s2">bin"</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>and in my case no more errors.  At this point if I was still seeing ImportError: DLL load failed while importing cv2: The specified module could not be found I would continue examining the output of process monitor until I get Result SUCCESS for all the .dll files python.exe tries to locate.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Permanantely-fixing">
+<a class="anchor" href="#Permanantely-fixing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Permanantely fixing<a class="anchor-link" href="#Permanantely-fixing"> </a>
+</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Updating-OpenCV's-installed-python-loader">
+<a class="anchor" href="#Updating-OpenCV's-installed-python-loader" aria-hidden="true"><span class="octicon octicon-link"></span></a>Updating OpenCV's installed python loader<a class="anchor-link" href="#Updating-OpenCV's-installed-python-loader"> </a>
+</h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>When OpenCV was installed .... only downside is that if you build install OpenCV again your changes will be lost</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Creating-python-loader">
+<a class="anchor" href="#Creating-python-loader" aria-hidden="true"><span class="octicon octicon-link"></span></a>Creating python loader<a class="anchor-link" href="#Creating-python-loader"> </a>
+</h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>If you have installed the python bindings already this will feel a little bit like re-inventing the wheel, but it has the advantage that you can quickly modify a single file to point to access python bindings for a different OpenCV build without too much trouble and your configuration shouldn't get overidden</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Recursion detected, when python .pyd is missing, check new install includes it, if not copy to lib/python to cv2/python-3.9 directory
+How to init</p>
+
+</div>
+</div>
+</div>
+</div>
+
+
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="cudawarped/opencv_docs"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/opencv_docs/opencv/cuda/python/2022/07/21/opencv_cvs_dll_load_failed.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/opencv_docs/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/opencv_docs/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/opencv_docs/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>An easy to use blogging platform with support for Jupyter Notebooks.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/fastai" target="_blank" title="fastai"><svg class="svg-icon grey"><use xlink:href="/opencv_docs/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/fastdotai" target="_blank" title="fastdotai"><svg class="svg-icon grey"><use xlink:href="/opencv_docs/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
